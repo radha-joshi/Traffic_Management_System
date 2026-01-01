@@ -9,44 +9,140 @@ h1 {
     color: #333;
 }
 
-#roadsContainer {
+.emergency-banner {
+    text-align: center;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.emergency-banner.active {
+    background-color: #ff4444;
+    color: white;
+    border: 2px solid #cc0000;
+}
+
+#controls {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+.emergency-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.emergency-form select, .emergency-form button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.emergency-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.emergency-btn:hover {
+    background-color: #c82333;
+}
+
+.clear-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.clear-btn:hover {
+    background-color: #218838;
+}
+
+#intersectionsContainer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
 }
 
-.road {
+.intersection {
     background-color: #fff;
     border-radius: 10px;
     padding: 15px;
-    width: 250px;
+    width: 300px;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
 }
 
-.road h3 {
+.intersection h3 {
     margin-top: 0;
     color: #555;
+    text-align: center;
 }
 
-.road p {
-    margin: 5px 0;
-}
-
-.road button {
-    margin: 5px 0;
-    padding: 5px 10px;
-    width: 100%;
-    border: none;
+.signal {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #eee;
     border-radius: 5px;
-    background-color: #007BFF;
-    color: white;
-    cursor: pointer;
+    text-align: center;
+}
+
+.signal-light {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 5px;
     font-weight: bold;
 }
 
-.road button:hover {
+.signal-light.green {
+    background-color: #28a745;
+    color: white;
+}
+
+.signal-light.red {
+    background-color: #dc3545;
+    color: white;
+}
+
+.signal-light.yellow {
+    background-color: #ffc107;
+    color: black;
+}
+
+.signal button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.signal button:hover {
     background-color: #0056b3;
+}
+
+.signal input {
+    width: 80px;
+    padding: 3px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
 }
 
 .road input[type="number"] {
