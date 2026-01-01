@@ -1,29 +1,24 @@
 from flask import Flask, request, jsonify, send_from_directory
-import mysql.connector
-from db import get_connection
-from traffic_controller import update_signal_logic
-from emergency_handler import handle_emergency, clear_emergency
 
-app = Flask(__name__)
+# Import from package
+from traffic_system.db import get_connection
+from traffic_system.traffic_controller import update_signal_logic
+from traffic_system.emergency_handler import handle_emergency, clear_emergency
+
+# Serve frontend from the new `frontend/` folder
+app = Flask(__name__, static_folder='frontend', static_url_path='')
 
 # --------------------------
 # Serve Frontend Files
 # --------------------------
 
-# Dashboard
 @app.route("/")
 def serve_dashboard():
-    return send_from_directory("../Frontend", "index.html")
+    return app.send_static_file('index.html')
 
-# JavaScript
-@app.route("/script.js")
-def serve_js():
-    return send_from_directory("../Frontend", "script.js")
-
-# CSS
-@app.route("/style.css")
-def serve_css():
-    return send_from_directory("../Frontend", "style.css")
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('frontend', path)
 
 # --------------------------
 # API Routes
@@ -76,7 +71,11 @@ def trigger_emergency():
 # Clear emergency
 @app.route("/emergency/clear", methods=["POST"])
 def clear_emergency_route():
-    clear_emergency()
+    payload = request.get_json() or {}
+    road_id = payload.get("road_id")
+    if road_id is None:
+        return jsonify({"status": "error", "message": "road_id required"}), 400
+    clear_emergency(road_id)
     return jsonify({"status": "emergency cleared"})
 
 # --------------------------

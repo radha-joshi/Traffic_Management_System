@@ -1,17 +1,5 @@
-import threading
-import time
+"""Compatibility shim for moved scheduler module."""
 
-# Critical Section Lock (OS concept)
-lock = threading.Lock()
+from traffic_system.scheduler import wait, critical_section
 
-def wait(seconds):
-    """Simulate waiting / sleep time"""
-    time.sleep(seconds)
-
-def critical_section(func, *args, **kwargs):
-    """
-    Simulate entering critical section with locking
-    """
-    with lock:
-        result = func(*args, **kwargs)
-    return result
+__all__ = ["wait", "critical_section"]
