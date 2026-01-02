@@ -1,13 +1,15 @@
 import mysql.connector
 import json
+import os
 
 def get_connection():
-    """Return a new MySQL connection. Configure via environment or edit defaults."""
+    """Return a new MySQL connection. Configure via environment variables."""
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Computer@12",
-        database="smart_traffic"
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD", "Computer@12"),
+        database=os.getenv("DB_NAME", "smart_traffic"),
+        port=int(os.getenv("DB_PORT", 3306))
     )
 
 def get_intersections():
