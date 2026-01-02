@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: traffic_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Computer@12
+      MYSQL_DATABASE: smart_traffic
+      MYSQL_USER: traffic_user
+      MYSQL_PASSWORD: traffic_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./traffic_sys.sql:/docker-entrypoint-initdb.d/traffic_sys.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    build: .
+    container_name: traffic_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: mysql
+      DB_USER: traffic_user
+      DB_PASSWORD: traffic_pass
+      DB_NAME: smart_traffic
+      DB_PORT: 3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./frontend/build:/app/frontend/build
+
+volumes:
+  mysql_data:
