@@ -1,8 +1,14 @@
 #!/bin/bash
-# Setup script for Traffic Management System
+# Setup script for Traffic Management System (Local Development)
 
 echo "🚦 Smart Traffic Management System Setup"
 echo "========================================"
+echo ""
+echo "Note: For easier deployment, consider using Docker:"
+echo "  docker-compose up --build"
+echo ""
+echo "Continuing with local setup..."
+echo ""
 
 # Check if MySQL is running
 echo "Checking MySQL status..."
