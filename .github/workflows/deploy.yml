@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "frontend/**" # Only runs when files inside the frontend folder change
+      - "frontend/**"
 
 permissions:
   contents: write
@@ -17,8 +17,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install and Build
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: frontend # The subfolder you want to deploy
-          branch: gh-pages # The branch the action will push to
+          folder: frontend/build # React-scripts builds to the 'build' folder
+          branch: gh-pages
