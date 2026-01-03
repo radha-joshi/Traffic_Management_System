@@ -48,7 +48,7 @@ function App() {
 
   const fetchIntersections = async () => {
     try {
-      const response = await fetch('/api/intersections');
+      const response = await fetch('https://traffic-backend-uz54.onrender.com/api/intersections');
       const data = await response.json();
       setIntersections(data);
       setIsLoading(false);
