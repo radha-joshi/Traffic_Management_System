@@ -1,0 +1,24 @@
+name: Deploy Frontend to Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**" # Only runs when files inside the frontend folder change
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend # The subfolder you want to deploy
+          branch: gh-pages # The branch the action will push to
