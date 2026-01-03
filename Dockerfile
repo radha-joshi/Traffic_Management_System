@@ -1,4 +1,21 @@
-# Use Python 3.9 slim image
+# Stage 1: Build frontend
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Build the frontend
+RUN npm run build
+
+# Stage 2: Python backend
 FROM python:3.9-slim
 
 # Set working directory
@@ -18,8 +35,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Build the frontend (assuming it's already built on host)
-# If frontend build is not present, this will fail - build frontend first
+# Copy built frontend from the frontend-builder stage
+COPY --from=frontend-builder /app/frontend/build ./frontend/build
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
