@@ -1,6 +1,10 @@
 import mysql.connector
 import json
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def get_connection():
     """Return a new MySQL connection. Configure via environment variables."""
