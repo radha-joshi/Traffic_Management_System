@@ -238,7 +238,7 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
 
 def run_server(port=5000):
     """Run the HTTP server"""
-    with socketserver.TCPServer(("", port), TrafficRequestHandler) as httpd:
+    with socketserver.TCPServer(("0.0.0.0", port), TrafficRequestHandler) as httpd:
         print(f"🚦 Traffic Management Server running on port {port}")
         print("Press Ctrl+C to stop")
         try:
