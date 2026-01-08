@@ -65,3 +65,5 @@ npm-debug.log*
 
 # MySQL dumps (optional - remove if you want to version control schema)
 # *.sql
+traffic_system/__pycache__/db.cpython-314.pyc
+

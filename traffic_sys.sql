@@ -1,74 +1,71 @@
-create database smart_traffic;
-use smart_traffic;
-
 -- Roads Table
 CREATE TABLE roads (
-    road_id INT AUTO_INCREMENT PRIMARY KEY,
-    road_name VARCHAR(50) NOT NULL
+    road_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    road_name TEXT NOT NULL
 );
 
 -- Intersections Table (representing traffic lights at intersections)
 CREATE TABLE intersections (
-    intersection_id INT AUTO_INCREMENT PRIMARY KEY,
-    intersection_name VARCHAR(50) NOT NULL,
-    latitude DECIMAL(10, 8),
-    longitude DECIMAL(11, 8)
+    intersection_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    intersection_name TEXT NOT NULL,
+    latitude REAL,
+    longitude REAL
 );
 
 -- Intersection-Road relationships (which roads meet at each intersection)
 CREATE TABLE intersection_roads (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    intersection_id INT,
-    road_id INT,
-    direction VARCHAR(20), -- 'north', 'south', 'east', 'west'
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    intersection_id INTEGER,
+    road_id INTEGER,
+    direction TEXT, -- 'north', 'south', 'east', 'west'
     FOREIGN KEY (intersection_id) REFERENCES intersections(intersection_id),
     FOREIGN KEY (road_id) REFERENCES roads(road_id)
 );
 
 -- Traffic Data Table
 CREATE TABLE traffic_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    intersection_id INT,
-    road_id INT,
-    vehicle_count INT,
-    density_level VARCHAR(20),
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    intersection_id INTEGER,
+    road_id INTEGER,
+    vehicle_count INTEGER,
+    density_level TEXT,
+    timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (intersection_id) REFERENCES intersections(intersection_id),
     FOREIGN KEY (road_id) REFERENCES roads(road_id)
 );
 
 -- Signal Status Table (one per intersection-road combination)
 CREATE TABLE signal_status (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    intersection_id INT,
-    road_id INT,
-    signal_color VARCHAR(10) DEFAULT 'RED',
-    green_time INT DEFAULT 0,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    intersection_id INTEGER,
+    road_id INTEGER,
+    signal_color TEXT DEFAULT 'RED',
+    green_time INTEGER DEFAULT 0,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (intersection_id) REFERENCES intersections(intersection_id),
     FOREIGN KEY (road_id) REFERENCES roads(road_id),
-    UNIQUE KEY unique_signal (intersection_id, road_id)
+    UNIQUE (intersection_id, road_id)
 );
 
 -- Emergency Routes (predefined paths for emergency vehicles)
 CREATE TABLE emergency_routes (
-    route_id INT AUTO_INCREMENT PRIMARY KEY,
-    route_name VARCHAR(100) NOT NULL,
-    start_intersection_id INT,
-    end_intersection_id INT,
-    path_order JSON, -- Array of intersection_ids in order
+    route_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    route_name TEXT NOT NULL,
+    start_intersection_id INTEGER,
+    end_intersection_id INTEGER,
+    path_order TEXT, -- JSON Array of intersection_ids in order
     FOREIGN KEY (start_intersection_id) REFERENCES intersections(intersection_id),
-    FOREIGN KEY (end_intersection_id) REFERENCES intersections(end_intersection_id)
+    FOREIGN KEY (end_intersection_id) REFERENCES intersections(intersection_id)
 );
 
 -- Emergency Logs
 CREATE TABLE emergency_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    route_id INT,
-    emergency_type VARCHAR(50),
-    status VARCHAR(20) DEFAULT 'ACTIVE',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    cleared_at DATETIME NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    route_id INTEGER,
+    emergency_type TEXT,
+    status TEXT DEFAULT 'ACTIVE',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    cleared_at TEXT,
     FOREIGN KEY (route_id) REFERENCES emergency_routes(route_id)
 );
 

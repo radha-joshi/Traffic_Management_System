@@ -1,4 +1,4 @@
-import mysql.connector
+import sqlite3
 import json
 import os
 from dotenv import load_dotenv
@@ -7,19 +7,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_connection():
-    """Return a new MySQL connection. Configure via environment variables."""
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", "Computer@12"),
-        database=os.getenv("DB_NAME", "smart_traffic"),
-        port=int(os.getenv("DB_PORT", 3306))
-    )
+    """Return a new SQLite connection."""
+    conn = sqlite3.connect('traffic.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def get_intersections():
     """Get all intersections with their connected roads."""
     conn = get_connection()
-    cur = conn.cursor(dictionary=True)
+    cur = conn.cursor()
 
     cur.execute("""
         SELECT i.*, GROUP_CONCAT(ir.road_id) as road_ids,
@@ -31,7 +27,7 @@ def get_intersections():
         GROUP BY i.intersection_id
     """)
 
-    intersections = cur.fetchall()
+    intersections = [dict(row) for row in cur.fetchall()]
     conn.close()
 
     # Parse the grouped data
@@ -45,10 +41,10 @@ def get_intersections():
 def get_emergency_routes():
     """Get all predefined emergency routes."""
     conn = get_connection()
-    cur = conn.cursor(dictionary=True)
+    cur = conn.cursor()
 
     cur.execute("SELECT * FROM emergency_routes")
-    routes = cur.fetchall()
+    routes = [dict(row) for row in cur.fetchall()]
 
     conn.close()
 

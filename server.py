@@ -8,7 +8,6 @@ import http.server
 import socketserver
 import json
 import urllib.parse
-import mysql.connector
 import os
 from traffic_system.db import get_connection, get_intersections, get_emergency_routes
 from traffic_system.traffic_controller import controller, start_traffic_controller
@@ -186,9 +185,8 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO traffic_data (intersection_id, road_id, vehicle_count)
-                VALUES (%s, %s, %s)
-                ON DUPLICATE KEY UPDATE vehicle_count=%s
-            """, (intersection_id, road_id, vehicle_count, vehicle_count))
+                VALUES (?, ?, ?)
+            """, (intersection_id, road_id, vehicle_count))
             conn.commit()
             cursor.close()
             conn.close()

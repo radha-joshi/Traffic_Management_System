@@ -72,7 +72,7 @@ class TrafficController:
             cur.execute("""
                 UPDATE signal_status
                 SET signal_color='RED', green_time=0
-                WHERE intersection_id=%s
+                WHERE intersection_id=?
             """, (intersection_id,))
 
             # Give GREEN to highest traffic direction
@@ -81,8 +81,8 @@ class TrafficController:
                 green_time = self.calculate_green_time(top_road['vehicle_count'])
                 cur.execute("""
                     UPDATE signal_status
-                    SET signal_color='GREEN', green_time=%s
-                    WHERE intersection_id=%s AND road_id=%s
+                    SET signal_color='GREEN', green_time=?
+                    WHERE intersection_id=? AND road_id=?
                 """, (green_time, intersection_id, top_road['road_id']))
 
         conn.commit()
@@ -99,7 +99,7 @@ class TrafficController:
         # Log the emergency
         cur.execute("""
             INSERT INTO emergency_logs (route_id, emergency_type, status)
-            VALUES (%s, %s, 'ACTIVE')
+            VALUES (?, ?, 'ACTIVE')
         """, (None, emergency_type))  # route_id can be NULL for dynamic routes
 
         # Set corridor timing - each intersection gets green for 20 seconds
@@ -116,8 +116,8 @@ class TrafficController:
 
             cur.execute("""
                 UPDATE signal_status
-                SET signal_color='GREEN', green_time=%s
-                WHERE intersection_id=%s
+                SET signal_color='GREEN', green_time=?
+                WHERE intersection_id=?
             """, (corridor_green_time, intersection_id))
 
             if i < len(route_path) - 1:  # Not the last intersection
@@ -127,7 +127,7 @@ class TrafficController:
                 cur.execute("""
                     UPDATE signal_status
                     SET signal_color='RED', green_time=0
-                    WHERE intersection_id=%s
+                    WHERE intersection_id=?
                 """, (intersection_id,))
 
         conn.commit()

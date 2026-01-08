@@ -28,9 +28,9 @@ def handle_emergency(start_intersection, end_intersection, emergency_type):
 
     cur.execute("""
         INSERT INTO emergency_logs (route_id, emergency_type, status)
-        SELECT route_id, %s, 'ACTIVE'
+        SELECT route_id, ?, 'ACTIVE'
         FROM emergency_routes
-        WHERE start_intersection_id = %s AND end_intersection_id = %s
+        WHERE start_intersection_id = ? AND end_intersection_id = ?
         LIMIT 1
     """, (emergency_type, start_intersection, end_intersection))
 
@@ -38,7 +38,7 @@ def handle_emergency(start_intersection, end_intersection, emergency_type):
     if cur.rowcount == 0:
         cur.execute("""
             INSERT INTO emergency_logs (emergency_type, status)
-            VALUES (%s, 'ACTIVE')
+            VALUES (?, 'ACTIVE')
         """, (emergency_type,))
 
     conn.commit()
