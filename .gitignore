@@ -67,3 +67,6 @@ npm-debug.log*
 # *.sql
 traffic_system/__pycache__/db.cpython-314.pyc
 
+traffic_system/__pycache__/emergency_handler.cpython-314.pyc
+traffic_system/__pycache__/emergency_handler.cpython-314.pyc
+traffic_system/__pycache__/traffic_controller.cpython-314.pyc

@@ -3,13 +3,8 @@ services:
     name: traffic-management-system
     env: docker
     plan: free
-    region: singapore # Change to your preferred region
+    region: singapore
     envVars:
-      - key: DB_HOST
-        value: your-external-db-host
-      - key: DB_USER
-        value: root
-      - key: DB_PASSWORD
-        value: your-password
-      - key: DB_NAME
-        value: smart_traffic
+      - key: PYTHONUNBUFFERED
+        value: "true"
+      # PORT is injected automatically by Render
