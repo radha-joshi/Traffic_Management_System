@@ -7,14 +7,16 @@ No Flask dependency - pure Python standard library
 import http.server
 import socketserver
 import json
-import urllib.parse
 import os
-from traffic_system.db import get_connection, get_intersections, get_emergency_routes
-from traffic_system.traffic_controller import controller, start_traffic_controller
-from traffic_system.emergency_handler import handle_emergency, clear_emergency, get_emergency_status, handle_emergency_legacy, clear_emergency_legacy
+import sys
 
-# Initialize traffic controller
-traffic_controller = start_traffic_controller()
+# Import these locally or ensure they don't auto-run logic on import
+from traffic_system.db import get_connection, get_intersections, get_emergency_routes
+from traffic_system.traffic_controller import start_traffic_controller
+from traffic_system.emergency_handler import handle_emergency, clear_emergency, get_emergency_status
+
+# GLOBAL VARIABLE (will be initialized in main)
+traffic_controller = None
 
 class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -22,8 +24,7 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_cors_headers()
 
         if self.path.startswith('/api/'):
-            # API endpoints
-            api_path = self.path[4:]  # Remove /api/ prefix
+            api_path = self.path[4:]
             if api_path == 'signal/status':
                 self.handle_signal_status()
             elif api_path == 'intersections':
@@ -35,47 +36,32 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             else:
                 self.send_error(404, "API endpoint not found")
         else:
-            # Serve static files from frontend/build
             self.serve_static_file()
 
+    # ... [Keep your existing serve_static_file method exactly as is] ...
     def serve_static_file(self):
         """Serve static files from frontend/build directory"""
-        # Remove query parameters
         path = self.path.split('?')[0]
-        
-        # Default to index.html for root path
         if path == '/':
             path = '/index.html'
         
-        # Build the file path
         file_path = os.path.join('frontend', 'build', path.lstrip('/'))
         
-        # Check if file exists
         if os.path.exists(file_path) and os.path.isfile(file_path):
-            # Determine content type
-            if path.endswith('.html'):
-                content_type = 'text/html'
-            elif path.endswith('.js'):
-                content_type = 'application/javascript'
-            elif path.endswith('.css'):
-                content_type = 'text/css'
-            elif path.endswith('.json'):
-                content_type = 'application/json'
-            elif path.endswith('.png'):
-                content_type = 'image/png'
-            elif path.endswith('.jpg') or path.endswith('.jpeg'):
-                content_type = 'image/jpeg'
-            else:
-                content_type = 'application/octet-stream'
+            if path.endswith('.html'): content_type = 'text/html'
+            elif path.endswith('.js'): content_type = 'application/javascript'
+            elif path.endswith('.css'): content_type = 'text/css'
+            elif path.endswith('.json'): content_type = 'application/json'
+            elif path.endswith('.png'): content_type = 'image/png'
+            elif path.endswith('.jpg') or path.endswith('.jpeg'): content_type = 'image/jpeg'
+            else: content_type = 'application/octet-stream'
             
             self.send_response(200)
             self.send_header('Content-Type', content_type)
             self.end_headers()
-            
             with open(file_path, 'rb') as f:
                 self.wfile.write(f.read())
         else:
-            # Serve index.html for SPA routing
             index_path = os.path.join('frontend', 'build', 'index.html')
             if os.path.exists(index_path):
                 self.send_response(200)
@@ -91,7 +77,7 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_cors_headers()
 
         if self.path.startswith('/api/'):
-            api_path = self.path[4:]  # Remove /api/ prefix
+            api_path = self.path[4:]
             if api_path == 'traffic/update':
                 self.handle_traffic_update()
             elif api_path == 'emergency/trigger':
@@ -104,23 +90,22 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(404, "Endpoint not found")
 
     def do_OPTIONS(self):
-        """Handle preflight CORS requests"""
         self.send_cors_headers()
         self.end_headers()
 
     def send_cors_headers(self):
-        """Send CORS headers"""
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.send_header('Content-Type', 'application/json')
 
+    # ... [Keep your existing handler methods (handle_signal_status, etc.) exactly as is] ...
     def handle_signal_status(self):
-        """Get current signal status"""
         try:
             conn = get_connection()
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor()
+            # Note: dictionary=True is not standard sqlite3, using row_factory in db.py handles this
             cursor.execute("""
                 SELECT ss.*, i.intersection_name, r.road_name, ir.direction
                 FROM signal_status ss
@@ -129,7 +114,8 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
                 JOIN intersection_roads ir ON ss.intersection_id = ir.intersection_id AND ss.road_id = ir.road_id
                 ORDER BY ss.intersection_id, ss.road_id
             """)
-            data = cursor.fetchall()
+            # Convert Row objects to dicts
+            data = [dict(row) for row in cursor.fetchall()]
             cursor.close()
             conn.close()
 
@@ -139,7 +125,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_intersections(self):
-        """Get intersections data"""
         try:
             intersections = get_intersections()
             self.end_headers()
@@ -148,7 +133,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_emergency_routes(self):
-        """Get emergency routes"""
         try:
             routes = get_emergency_routes()
             self.end_headers()
@@ -157,7 +141,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_emergency_status(self):
-        """Get emergency status"""
         try:
             status = get_emergency_status()
             self.end_headers()
@@ -166,7 +149,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_traffic_update(self):
-        """Update traffic data"""
         try:
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -180,7 +162,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error(400, "intersection_id, road_id, and vehicle_count required")
                 return
 
-            # Update traffic_data table
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("""
@@ -191,8 +172,9 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             cursor.close()
             conn.close()
 
-            # Update signal logic
-            controller.update_signal_logic()
+            # GLOBAL traffic_controller usage
+            if traffic_controller:
+                traffic_controller.update_signal_logic()
 
             self.end_headers()
             self.wfile.write(json.dumps({"status": "success"}).encode())
@@ -200,7 +182,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_emergency_trigger(self):
-        """Trigger emergency"""
         try:
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -222,7 +203,6 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def handle_emergency_clear(self):
-        """Clear emergency"""
         try:
             result = clear_emergency()
             self.end_headers()
@@ -231,14 +211,15 @@ class TrafficRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(500, str(e))
 
     def log_message(self, format, *args):
-        """Override to reduce log noise"""
         return
 
-def run_server(port=5000):
+def run_server():
     """Run the HTTP server"""
+    # CRITICAL FIX: Get PORT from environment for Render
+    port = int(os.environ.get("PORT", 5000))
+    
     with socketserver.TCPServer(("0.0.0.0", port), TrafficRequestHandler) as httpd:
         print(f"🚦 Traffic Management Server running on port {port}")
-        print("Press Ctrl+C to stop")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
@@ -246,4 +227,17 @@ def run_server(port=5000):
             httpd.shutdown()
 
 if __name__ == "__main__":
+    # CRITICAL FIX: Initialize DB if it doesn't exist
+    if not os.path.exists('traffic.db'):
+        print("Initializing SQLite database...")
+        try:
+            from init_db import init_db
+            init_db()
+        except ImportError:
+            print("Could not import init_db. Ensure init_db.py is in the root directory.")
+
+    # CRITICAL FIX: Start controller AFTER DB is ready
+    print("Starting Traffic Controller...")
+    traffic_controller = start_traffic_controller()
+    
     run_server()
