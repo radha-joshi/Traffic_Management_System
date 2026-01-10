@@ -22,7 +22,7 @@ const LiveMap = ({ data }: { data: any }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap'
         />
-        {/* Safety check: Only map if data is an array */}
+        
         {Array.isArray(data) && data.map((item: any) => (
           <Marker key={item.id} position={[item.lat, item.lng]} icon={icon}>
             <Popup>{item.location} - {item.status}</Popup>
