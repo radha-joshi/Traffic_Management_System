@@ -27,9 +27,8 @@ function App() {
 
       <div style={{ padding: '20px' }}>
         {/* Pass data to components */}
-        {/* <LiveMap data = "{}" /> */}
         <LiveMap data={data} />
-        {/* <Dashboard data={data} /> */}
+        <Dashboard data={data} />
       </div>
     </div>
   );
