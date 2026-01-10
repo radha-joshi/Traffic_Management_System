@@ -27,33 +27,65 @@ const RouteSelector: React.FC<RouteSelectorProps> = ({ data, onRouteSelect }) =>
   };
 
   return (
-    <div style={{ padding: '20px', border: '1px solid #ccc', marginBottom: '20px' }}>
-      <h3>Select Route Points</h3>
-      <div style={{ marginBottom: '10px' }}>
-        <label>
+    <div style={{
+      padding: '20px',
+      background: 'rgba(255,255,255,0.1)',
+      borderRadius: '15px',
+      marginBottom: '20px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+      color: 'white'
+    }}>
+      <h3 style={{ marginBottom: '15px', color: '#ffd700' }}>🗺️ Select Route Points</h3>
+      <div style={{ marginBottom: '15px' }}>
+        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
           Start Location:
-          <select value={startId} onChange={handleStartChange}>
-            <option value="">Select Start</option>
-            {data.map(item => (
-              <option key={item.id} value={item.id}>
-                {item.location} ({item.status})
-              </option>
-            ))}
-          </select>
         </label>
+        <select
+          value={startId}
+          onChange={handleStartChange}
+          style={{
+            width: '100%',
+            padding: '10px',
+            borderRadius: '8px',
+            border: 'none',
+            background: 'rgba(255,255,255,0.2)',
+            color: 'white',
+            fontSize: '1em'
+          }}
+        >
+          <option value="" style={{ background: '#333' }}>Select Start</option>
+          {data.map(item => (
+            <option key={item.id} value={item.id} style={{ background: '#333' }}>
+              {item.location} ({item.status})
+            </option>
+          ))}
+        </select>
       </div>
-      <div style={{ marginBottom: '10px' }}>
-        <label>
+      <div style={{ marginBottom: '15px' }}>
+        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
           End Location:
-          <select value={endId} onChange={handleEndChange}>
-            <option value="">Select End</option>
-            {data.map(item => (
-              <option key={item.id} value={item.id}>
-                {item.location} ({item.status})
-              </option>
-            ))}
-          </select>
         </label>
+        <select
+          value={endId}
+          onChange={handleEndChange}
+          style={{
+            width: '100%',
+            padding: '10px',
+            borderRadius: '8px',
+            border: 'none',
+            background: 'rgba(255,255,255,0.2)',
+            color: 'white',
+            fontSize: '1em'
+          }}
+        >
+          <option value="" style={{ background: '#333' }}>Select End</option>
+          {data.map(item => (
+            <option key={item.id} value={item.id} style={{ background: '#333' }}>
+              {item.location} ({item.status})
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );
