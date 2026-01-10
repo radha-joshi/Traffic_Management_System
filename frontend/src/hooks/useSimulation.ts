@@ -8,28 +8,12 @@ export function useSimulation(initialData: DataItem[]) {
     const interval = setInterval(() => {
       setData(prevData =>
         prevData.map(item => {
-          const shouldUpdateStatus = Math.random() < 0.3; // 30% chance to update status
-          const shouldWiggleCoords = Math.random() < 0.5; // 50% chance to wiggle coords
-
-          let newItem = { ...item };
-
-          if (shouldUpdateStatus) {
-            const statuses: DataItem['status'][] = ['active', 'inactive', 'maintenance', 'error'];
-            newItem.status = statuses[Math.floor(Math.random() * statuses.length)];
-          }
-
-          if (shouldWiggleCoords) {
-            newItem.lat += (Math.random() - 0.5) * 0.001; // Small wiggle
-            newItem.lng += (Math.random() - 0.5) * 0.001;
-          }
-
-          newItem.timestamp = new Date();
-          newItem.efficiency = Math.max(0, Math.min(100, newItem.efficiency + (Math.random() - 0.5) * 10));
-
-          return newItem;
+          // Randomly update vehicle count slightly
+          const newVehicles = Math.max(0, item.vehicles + (Math.random() - 0.5) * 10);
+          return { ...item, vehicles: Math.round(newVehicles) };
         })
       );
-    }, 2000); // Every 2 seconds
+    }, 5000); // Update every 5 seconds
 
     return () => clearInterval(interval);
   }, [initialData]);
